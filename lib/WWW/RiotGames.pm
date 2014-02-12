@@ -1,6 +1,6 @@
 package WWW::RiotGames;
 
-use LWP::Simple;
+use LWP::UserAgent;
 use JSON qw( decode_json );
 use strict;
 use warnings;
@@ -37,7 +37,14 @@ sub set_api_key {
 
 sub make_api_call {
     my ($lookup) = @_;
-    decode_json( get($url_base . "lol/" . $region . $lookup . "?api_key=$api_key") );
+		my $ua = LWP::UserAgent->new;
+		$ua->timeout(10);
+		my $response = $ua->get($url_base . "lol/" . $region . $lookup . "?api_key=$api_key");
+		if($response->is_success){
+			decode_json($response->content);
+		}else{
+			die $response->status_line;
+		}
 }
 
 # Champions
